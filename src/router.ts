@@ -17,7 +17,9 @@ import {
 import { signIn } from "./controller/SessionController";
 import {
   createStore,
+  deleteStore,
   getAllStore,
+  getUniqueStore,
   updateStore,
 } from "./controller/StoreController";
 import {
@@ -57,11 +59,21 @@ router.get(
   authMiddleware(["adm", "Vendedor", "Comprador"]),
   getAllStore
 );
+router.get(
+  "/get-unique-store/:storeId",
+  authMiddleware(["adm", "Vendedor", "Comprador"]),
+  getUniqueStore
+);
 router.put(
   "/update-store/:storeId",
   authMiddleware(["adm", "Vendedor"]),
   updateStore
 );
+router.delete(
+  "/delete-store/:storeId",
+  authMiddleware(["adm", "Vendedor"]),
+  deleteStore
+)
 
 /**
  * Rotas do produto
