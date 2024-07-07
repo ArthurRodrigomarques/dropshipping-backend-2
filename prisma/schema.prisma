@@ -38,14 +38,22 @@ model Access {
   updated_at DateTime     @updatedAt
 }
 
+model ProductImage {
+  id       String @id @default(uuid())
+  imageUrl String
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String
+}
+
 model Product {
-  id          String        @id @default(uuid())
+  id          String         @id @default(uuid())
   name        String
   price       Float
   amount      Int
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @updatedAt
-  Store       Store?        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  images      ProductImage[]
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+  Store       Store?         @relation(fields: [storeId], references: [id], onDelete: Cascade)
   storeId     String?
   SaleProduct SaleProduct[]
 }

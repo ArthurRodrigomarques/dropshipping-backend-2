@@ -29,6 +29,7 @@ import {
   getUniqueUser,
 } from "./controller/UserController";
 import { authMiddleware } from "./middlewares/AuthMiddleware";
+import multerConfig from "../config/multer";
 
 export const router = Router();
 
@@ -80,12 +81,12 @@ router.delete(
  */
 router.post(
   "/product/:storeId",
+  multerConfig.array('images', 5),
   authMiddleware(["adm", "Vendedor"]),
   createProduct
 );
 router.get(
   "/products",
-  authMiddleware(["adm", "Vendedor", "Comprador"]),
   getAllProducts
 );
 router.put(
