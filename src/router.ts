@@ -96,7 +96,6 @@ router.put(
 );
 router.get(
   "/get-unique-product/:productId",
-  authMiddleware(["adm", "Vendedor", "Comprador"]),
   getUniqueProduct
 );
 router.delete(

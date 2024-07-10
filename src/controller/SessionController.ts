@@ -44,7 +44,7 @@ export const signIn = async (req: Request, res: Response) => {
       userId: user.id, roles: user.userAccess.map(role => role.Access?.name)
     }, MY_SECRET_KEY, {
       algorithm: "HS256",
-      expiresIn: "1h"
+      expiresIn: "24h"
     })
 
     return res.status(200).json({token})

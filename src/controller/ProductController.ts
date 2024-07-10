@@ -4,13 +4,14 @@ import { prisma } from '../database/prisma';
 import uploadImage from '../database/firebase';
 
 export const createProduct = async (req: Request, res: Response) => {
-  const { name, price, amount } = req.body;
+  const { name, price, amount, description } = req.body;
   const { storeId } = req.params;
 
   try {
     const product = await prisma.product.create({
       data: {
         name,
+        description,
         price: parseFloat(price),
         amount: parseInt(amount, 10),
         Store: {
@@ -72,7 +73,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
-  const { name, price, amount } = req.body;
+  const { name, price, amount, description } = req.body;
   const { productId } = req.params;
   const { id } = req.user as Prisma.UserWhereUniqueInput;
 
@@ -100,6 +101,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       },
       data: {
         name,
+        description,
         price: parseFloat(price),
         amount: parseInt(amount, 10),
       },
@@ -107,6 +109,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 
     return res.status(200).json(updatedProduct);
   } catch (error) {
+    console.error('Erro ao atualizar o produto:', error);
     return res.status(400).json({ message: 'Erro ao atualizar o produto', error });
   }
 };
@@ -122,6 +125,7 @@ export const getUniqueProduct = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
+        description: true,
         price: true,
         amount: true,
         images: true,
@@ -149,6 +153,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
       },
       include: {
         Store: true,
+        images: true,
       },
     });
 
@@ -160,6 +165,14 @@ export const deleteProduct = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Este produto não pertence a esse usuário' });
     }
 
+    // Deletar todas as imagens associadas ao produto
+    await prisma.productImage.deleteMany({
+      where: {
+        productId: productId,
+      },
+    });
+
+    // Deletar o produto
     await prisma.product.delete({
       where: {
         id: productId,
