@@ -36,7 +36,7 @@ export const router = Router();
 /**
  * Rotas do usuário
  */
-router.post("/login", createUser);
+router.post("/register", createUser);
 router.delete("/delete-users", authMiddleware(["adm"]), deleteManyUser);
 router.get("/get-all-users", authMiddleware(["adm"]), getAllUser);
 router.get(
