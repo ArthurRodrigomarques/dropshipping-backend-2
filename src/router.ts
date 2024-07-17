@@ -117,10 +117,10 @@ router.post(
   authMiddleware(["adm", "Vendedor", "Comprador"]),
   createSale
 );
-router.get("/get-all-sales", authMiddleware(["adm"]), getAllSales);
+router.get("/get-all-sales", authMiddleware(["adm", "Vendedor"]), getAllSales);
 router.get(
   "/get-all-sales-by-buyer",
-  authMiddleware(["adm", "Comprador"]),
+  authMiddleware(["adm", "Vendedor","Comprador"]),
   getAllSalesByBuyer
 );
 router.get(
