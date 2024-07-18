@@ -30,6 +30,8 @@ import {
 } from "./controller/UserController";
 import { authMiddleware } from "./middlewares/AuthMiddleware";
 import multerConfig from "../config/multer";
+import { createCheckoutSession, handleWebhook } from "./middlewares/WebHooks";
+import bodyParser from "body-parser";
 
 export const router = Router();
 
@@ -112,6 +114,13 @@ router.post("/sign-in", signIn);
 /**
  * Rotas da venda
  */
+router.post(
+  "/create-checkout-session",
+  // authMiddleware(["adm", "Vendedor", "Comprador"]),
+  createCheckoutSession)
+router.post('/webhook', bodyParser.raw({type: 'application/json'}), handleWebhook)
+
+
 router.post(
   "/create-sale",
   authMiddleware(["adm", "Vendedor", "Comprador"]),
