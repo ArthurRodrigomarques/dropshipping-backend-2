@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import stripe from '../database/stripe';
 import { prisma } from "../database/prisma";
-import { createSale } from "../controller/SaleController";
 import Stripe from "stripe";
 
 const formatPrice = (amountInCents: number): string => {
