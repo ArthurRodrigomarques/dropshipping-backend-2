@@ -24,12 +24,15 @@ import {
 } from "./controller/StoreController";
 import {
   createUser,
-  deleteManyUser,
+  deleteUser,
   getAllUser,
   getUniqueUser,
+  getUniqueUserId,
 } from "./controller/UserController";
 import { authMiddleware } from "./middlewares/AuthMiddleware";
 import multerConfig from "../config/multer";
+import { createCheckoutSession, handleWebhook } from "./middlewares/WebHooks";
+import bodyParser from "body-parser";
 
 export const router = Router();
 
@@ -37,12 +40,17 @@ export const router = Router();
  * Rotas do usuário
  */
 router.post("/register", createUser);
-router.delete("/delete-users", authMiddleware(["adm"]), deleteManyUser);
+router.delete("/delete-users", authMiddleware(["adm"]), deleteUser);
 router.get("/get-all-users", authMiddleware(["adm"]), getAllUser);
 router.get(
   "/get-unique-user",
   authMiddleware(["adm", "Vendedor", "Comprador"]),
   getUniqueUser
+);
+router.get(
+  "/get-unique-user-id/:id",
+  // authMiddleware(["adm", "Vendedor", "Comprador"]),
+  getUniqueUserId
 );
 
 /**
@@ -113,14 +121,21 @@ router.post("/sign-in", signIn);
  * Rotas da venda
  */
 router.post(
+  "/create-checkout-session",
+ authMiddleware(["adm", "Vendedor", "Comprador"]),
+  createCheckoutSession)
+router.post('/webhook', bodyParser.raw({type: 'application/json'}), handleWebhook)
+
+
+router.post(
   "/create-sale",
   authMiddleware(["adm", "Vendedor", "Comprador"]),
   createSale
 );
-router.get("/get-all-sales", authMiddleware(["adm"]), getAllSales);
+router.get("/get-all-sales", authMiddleware(["adm", "Vendedor"]), getAllSales);
 router.get(
   "/get-all-sales-by-buyer",
-  authMiddleware(["adm", "Comprador"]),
+  authMiddleware(["adm", "Vendedor","Comprador"]),
   getAllSalesByBuyer
 );
 router.get(

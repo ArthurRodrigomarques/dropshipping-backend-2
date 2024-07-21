@@ -70,13 +70,27 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteManyUser = async (req: Request, res: Response) => {
-  try {
-    await prisma.user.deleteMany();
 
-    return res.status(200).json({ message: "Usuário deletados" });
+
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    // Obtendo o ID a partir dos parâmetros da URL
+    const { id } = req.params;
+
+    // Verifica se o ID foi fornecido
+    if (!id) {
+      return res.status(400).json({ message: "ID do usuário não fornecido" });
+    }
+
+    const deletedUser = await prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    return res.status(200).json({ message: "Usuário deletado com sucesso", user: deletedUser });
   } catch (error) {
-    return res.status(400).json(error);
+    return res.status(400).json({ message: "Erro ao deletar o usuário", error });
   }
 };
 
@@ -144,5 +158,46 @@ export const getUniqueUser = async (req: Request, res: Response) => {
     return res.status(200).json(user);
   } catch (error) {
     return res.status(400).json(error);
+  }
+};
+
+export const getUniqueUserId = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        userAccess: {
+          select: {
+            Access: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        store: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+    
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Erro ao buscar o usuário:", error); // Log para depuração
+    return res.status(400).json({ message: "Erro ao buscar o usuário", error });
   }
 };
