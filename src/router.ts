@@ -33,6 +33,7 @@ import { authMiddleware } from "./middlewares/AuthMiddleware";
 import multerConfig from "../config/multer";
 import { createCheckoutSession, handleWebhook } from "./middlewares/WebHooks";
 import bodyParser from "body-parser";
+import { createAddress, deleteAddress, getAddressById, updateAddress } from "./controller/AddressController";
 
 export const router = Router();
 
@@ -52,6 +53,26 @@ router.get(
   // authMiddleware(["adm", "Vendedor", "Comprador"]),
   getUniqueUserId
 );
+
+
+// rotas de endereço
+router.post("/address",  
+  authMiddleware(["adm", "Vendedor", "Comprador"]),
+  createAddress
+);
+router.get("/addresses/:id",
+  authMiddleware(["adm", "Vendedor", "Comprador"]),
+   getAddressById
+);
+router.put("/addresses", 
+  authMiddleware(["adm", "Vendedor", "Comprador"]),
+  updateAddress
+);
+router.delete("/addresses/:id", 
+  authMiddleware(["adm", "Vendedor", "Comprador"]),
+  deleteAddress
+);
+
 
 /**
  * Rotas de acessos
@@ -125,7 +146,6 @@ router.post(
  authMiddleware(["adm", "Vendedor", "Comprador"]),
   createCheckoutSession)
 router.post('/webhook', bodyParser.raw({type: 'application/json'}), handleWebhook)
-
 
 router.post(
   "/create-sale",

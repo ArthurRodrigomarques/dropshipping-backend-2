@@ -74,10 +74,8 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    // Obtendo o ID a partir dos parâmetros da URL
     const { id } = req.params;
 
-    // Verifica se o ID foi fornecido
     if (!id) {
       return res.status(400).json({ message: "ID do usuário não fornecido" });
     }
