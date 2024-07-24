@@ -31,9 +31,10 @@ import {
 } from "./controller/UserController";
 import { authMiddleware } from "./middlewares/AuthMiddleware";
 import multerConfig from "../config/multer";
-import { createCheckoutSession, handleWebhook } from "./middlewares/WebHooks";
+import { handleWebhook } from "./middlewares/WebHooks";
 import bodyParser from "body-parser";
 import { createAddress, deleteAddress, getAddressById, updateAddress } from "./controller/AddressController";
+import { createCheckoutSession, getOrderDetails, getOrdersForAdmin } from "./controller/OrderController";
 
 export const router = Router();
 
@@ -145,7 +146,13 @@ router.post(
   "/create-checkout-session",
  authMiddleware(["adm", "Vendedor", "Comprador"]),
   createCheckoutSession)
+
 router.post('/webhook', bodyParser.raw({type: 'application/json'}), handleWebhook)
+
+router.get("/admin/orders", getOrdersForAdmin)
+
+router.get("/order-details", getOrderDetails);
+
 
 router.post(
   "/create-sale",
@@ -163,3 +170,6 @@ router.get(
   authMiddleware(["adm", "Vendedor"]),
   getAllSalesBySeller
 );
+
+// Controle de vendas
+
