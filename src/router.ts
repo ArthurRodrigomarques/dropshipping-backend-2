@@ -34,7 +34,7 @@ import multerConfig from "../config/multer";
 import { handleWebhook } from "./middlewares/WebHooks";
 import bodyParser from "body-parser";
 import { createAddress, deleteAddress, getAddressById, updateAddress } from "./controller/AddressController";
-import { createCheckoutSession, getOrderDetails, getOrdersForAdmin } from "./controller/OrderController";
+import { createCheckoutSession, getAllSessions, getSessionById } from "./controller/OrderController";
 
 export const router = Router();
 
@@ -143,15 +143,16 @@ router.post("/sign-in", signIn);
  * Rotas da venda
  */
 router.post(
-  "/create-checkout-session",
- authMiddleware(["adm", "Vendedor", "Comprador"]),
-  createCheckoutSession)
+  '/create-checkout-session',
+  authMiddleware(['adm', 'Vendedor', 'Comprador']),
+  createCheckoutSession
+);
 
-router.post('/webhook', bodyParser.raw({type: 'application/json'}), handleWebhook)
+router.post('/webhook', bodyParser.raw({ type: 'application/json' }), handleWebhook);
 
-router.get("/admin/orders", getOrdersForAdmin)
+router.get('/get-all-sessions', getAllSessions);
 
-router.get("/order-details", getOrderDetails);
+router.get('/session/:id', getSessionById);
 
 
 router.post(

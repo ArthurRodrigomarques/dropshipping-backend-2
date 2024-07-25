@@ -28,7 +28,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
 
     const buyer = await prisma.user.findUnique({
       where: { id: buyerId },
-      select: { id: true, name: true }
+      select: { id: true, name: true, email: true }
     });
 
     if (!seller) {
@@ -79,7 +79,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
         buyerId,
         userSellerId,
         products: JSON.stringify(products),
-        address: address ? JSON.stringify(address) : null,  // Adicionando endereço nos metadados
+        address: address ? JSON.stringify(address) : null,
       },
     });
 
@@ -103,67 +103,45 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
   }
 };
 
-export const getOrdersForAdmin = async (req: Request, res: Response) => {
+
+export const getAllSessions = async (req: Request, res: Response) => {
   try {
-    const orders = await prisma.sale.findMany({
-      include: {
-        SaleProduct: {
-          include: {
-            Product: true,
-          },
-        },
-        Address: true,
-        Buyer: true,
-        Seller: true,
-      },
+    const sessions = await stripe.checkout.sessions.list({
+      limit: 100,
     });
+    
+    const sessionsWithMetadata = sessions.data.map(session => ({
+      id: session.id,
+      email: session.customer_details,
+      metadata: session.metadata,
+    }));
 
-    console.log('Pedidos:', orders);
-
-    res.json(orders);
+    res.status(200).json(sessionsWithMetadata);
   } catch (error) {
-    console.error('Erro ao buscar pedidos:', error);
-    res.status(500).json({ error: 'Erro ao buscar pedidos' });
+    console.error('Erro ao buscar sessões:', error);
+    res.status(500).json({ error: 'Failed to fetch sessions' });
   }
 };
 
-
-
-export const getOrderDetails = async (req: Request, res: Response) => {
-  const { session_id } = req.query;
-
-  if (!session_id) {
-    return res.status(400).json({ error: 'Session ID is required' });
-  }
+export const getSessionById = async (req: Request, res: Response) => {
+  const { id } = req.params;
 
   try {
-    const session = await stripe.checkout.sessions.retrieve(session_id as string);
+    const session = await stripe.checkout.sessions.retrieve(id);
 
-    if (!session.metadata || !session.metadata.saleId) {
-      return res.status(404).json({ error: 'Sale not found' });
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
     }
 
-    const sale = await prisma.sale.findUnique({
-      where: { id: session.metadata.saleId },
-      include: {
-        Buyer: true,
-        Seller: true,
-        Address: true,
-        SaleProduct: {
-          include: {
-            Product: true,
-          },
-        },
-      },
-    });
+    const sessionData = {
+      id: session.id,
+      email: session.customer_details,
+      metadata: session.metadata,
+    };
 
-    if (!sale) {
-      return res.status(404).json({ error: 'Sale not found' });
-    }
-
-    res.json(sale);
+    res.status(200).json(sessionData);
   } catch (error) {
-    console.error('Erro ao buscar detalhes da venda:', error);
-    res.status(500).json({ error: 'Erro ao buscar detalhes da venda' });
+    console.error('Erro ao buscar sessão:', error);
+    res.status(500).json({ error: 'Failed to fetch session' });
   }
 };

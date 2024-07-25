@@ -79,7 +79,7 @@ model Sale {
   sellerId        String?
   Address         Address?      @relation(fields: [addressId], references: [id])
   addressId       String?
-  stripeSessionId String?
+  stripeSessionId String?       @unique
   SaleProduct     SaleProduct[]
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
