@@ -71,21 +71,24 @@ model Store {
 }
 
 model Sale {
-  id          String        @id @default(uuid())
-  total_value Float
-  Buyer       User?         @relation("buyer", fields: [buyerId], references: [id])
-  buyerId     String?
-  Seller      User?         @relation("seller", fields: [sellerId], references: [id])
-  sellerId    String?
-  SaleProduct SaleProduct[]
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @updatedAt
+  id              String        @id @default(uuid())
+  total_value     Float
+  Buyer           User?         @relation("buyer", fields: [buyerId], references: [id])
+  buyerId         String?
+  Seller          User?         @relation("seller", fields: [sellerId], references: [id])
+  sellerId        String?
+  Address         Address?      @relation(fields: [addressId], references: [id])
+  addressId       String?
+  stripeSessionId String?       @unique
+  SaleProduct     SaleProduct[]
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
 }
 
 model SaleProduct {
   id         String   @id @default(uuid())
   quantity   Int
-  Sale       Sale     @relation(fields: [saleId], references: [id])
+  Sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
   saleId     String
   Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId  String
@@ -104,4 +107,5 @@ model Address {
   User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  Sale       Sale[]
 }
