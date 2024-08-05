@@ -20,9 +20,12 @@ export const createProduct = async (req: Request, res: Response) => {
           },
         },
       },
+      include: {
+        images: true,
+      },
     });
 
-    const imageUploadPromises = (req.files as Express.Multer.File[]).map(async (file) => {
+    const imageUploadPromises = (req.files as Express.Multer.File[]).map(async (file, index) => {
       const request = { file } as any;
       await new Promise<void>((resolve, reject) => {
         uploadImage(request, res, async () => {
@@ -32,6 +35,7 @@ export const createProduct = async (req: Request, res: Response) => {
                 data: {
                   imageUrl: request.file.firebaseUrl,
                   productId: product.id,
+                  isMain: index === 0, 
                 },
               });
               resolve();
@@ -47,11 +51,19 @@ export const createProduct = async (req: Request, res: Response) => {
 
     await Promise.all(imageUploadPromises);
 
-    return res.status(201).json(product);
+    // Recarregar o produto para incluir as imagens adicionadas
+    const updatedProduct = await prisma.product.findUnique({
+      where: { id: product.id },
+      include: { images: true },
+    });
+
+    return res.status(201).json(updatedProduct);
   } catch (error) {
     return res.status(400).json({ message: 'Erro ao criar o produto', error });
   }
 };
+
+
 
 export const getAllProducts = async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string, 10) || 1;
