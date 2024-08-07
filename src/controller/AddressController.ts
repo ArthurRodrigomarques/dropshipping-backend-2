@@ -1,85 +1,90 @@
 import { Request, Response } from 'express';
-import { prisma } from "../database/prisma"
-import { Prisma } from '@prisma/client';
-
+import { prisma }from '../database/prisma';
 
 export const createAddress = async (req: Request, res: Response) => {
-    const { street, city, state, country, zip } = req.body;
-    const { id } = req.user;
-  
-    try {
-      const existingAddress = await prisma.address.findUnique({
-        where: { userId: id },
-      });
-  
-      if (existingAddress) {
-        return res.status(400).json({ message: "Usuário já possui um endereço." });
-      }
-  
-      const newAddress = await prisma.address.create({
-        data: {
-          street,
-          city,
-          state,
-          country,
-          zip,
-          userId: id,
-        },
-      });
-  
-      return res.status(201).json(newAddress);
-    } catch (error) {
-      return res.status(500).json({ message: "Erro ao criar endereço.", error });
+  const { street, city, state, country, zip, houseNumber, complement, neighborhood } = req.body;
+  const { id } = req.user;
+
+  try {
+    const existingAddress = await prisma.address.findUnique({
+      where: { userId: id },
+    });
+
+    if (existingAddress) {
+      return res.status(400).json({ message: "Usuário já possui um endereço." });
     }
-  };
 
-export const getAddressById = async (req:Request, res: Response) => {
-    const { id } = req.params;
+    const newAddress = await prisma.address.create({
+      data: {
+        street,
+        city,
+        state,
+        country,
+        zip,
+        houseNumber,
+        complement,
+        neighborhood,
+        userId: id,
+      },
+    });
 
-    try {
-        const address = await prisma.address.findUnique({
-            where: { userId: id },
-        })
+    return res.status(201).json(newAddress);
+  } catch (error) {
+    return res.status(500).json({ message: "Erro ao criar endereço.", error });
+  }
+};
 
-        if (!address) {
-            return res.status(404).json({ message: "Endereço não encontrado"})
-        }
+export const getAddressById = async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-       return res.status(200).json(address);
-    } catch (error) {
-        res.status(500).json({ error: 'falha ao encotrar o endereço' });
+  try {
+    const address = await prisma.address.findUnique({
+      where: { userId: id },
+    });
+
+    if (!address) {
+      return res.status(404).json({ message: "Endereço não encontrado" });
     }
-}
+
+    return res.status(200).json(address);
+  } catch (error) {
+    res.status(500).json({ error: 'Falha ao encontrar o endereço' });
+  }
+};
 
 export const updateAddress = async (req: Request, res: Response) => {
-    const { street, city, state, country, zip } = req.body;
-    const { id } = req.user;
-  
-    try {
-      const existingAddress = await prisma.address.findUnique({
-        where: { userId: id },
-      });
-  
-      if (!existingAddress) {
-        return res.status(404).json({ message: "Endereço não encontrado." });
-      }
-  
-      const updatedAddress = await prisma.address.update({
-        where: { userId: id },
-        data: {
-          street,
-          city,
-          state,
-          country,
-          zip,
-        },
-      });
-  
-      return res.status(200).json(updatedAddress);
-    } catch (error) {
-      return res.status(500).json({ message: "Erro ao atualizar endereço.", error });
+  const { street, city, state, country, zip, houseNumber, complement, neighborhood } = req.body;
+  const { id } = req.user;
+
+  try {
+    const existingAddress = await prisma.address.findUnique({
+      where: { userId: id },
+    });
+
+    if (!existingAddress) {
+      return res.status(404).json({ message: "Endereço não encontrado." });
     }
-  };
+
+    const updatedAddress = await prisma.address.update({
+      where: { userId: id },
+      data: {
+        street,
+        city,
+        state,
+        country,
+        zip,
+        houseNumber,
+        complement,
+        neighborhood,
+      },
+    });
+
+    return res.status(200).json(updatedAddress);
+  } catch (error) {
+    return res.status(500).json({ message: "Erro ao atualizar endereço.", error });
+  }
+};
+
 
   export const deleteAddress = async (req: Request, res: Response) => {
     const { id } = req.user;
