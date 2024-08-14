@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id             String       @id @default(uuid())
-  name           String
-  email          String       @unique
-  password       String
-  sale_as_buyer  Sale[]       @relation("buyer")
-  sale_as_seller Sale[]       @relation("seller")
-  userAccess     UserAccess[]
-  store          Store[]
-  addresses      Address[]
-  created_at     DateTime     @default(now())
-  updated_at     DateTime     @updatedAt
+  id                 String               @id @default(uuid())
+  name               String
+  email              String               @unique
+  password           String
+  sale_as_buyer      Sale[]               @relation("buyer")
+  sale_as_seller     Sale[]               @relation("seller")
+  userAccess         UserAccess[]
+  store              Store[]
+  addresses          Address[]
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  PasswordResetToken PasswordResetToken[]
 }
 
 model UserAccess {
@@ -29,6 +30,15 @@ model UserAccess {
   accessId   String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
 
 model Access {
