@@ -145,3 +145,30 @@ export const getSessionById = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch session' });
   }
 };
+
+
+export const getUserSessions = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const sessions = await stripe.checkout.sessions.list({
+      limit: 100,
+    });
+
+    // Verifique se o metadata e o buyerId estão definidos antes de filtrar
+    const userSessions = sessions.data.filter(session => 
+      session.metadata && session.metadata.buyerId === id
+    );
+
+    const sessionsWithMetadata = userSessions.map(session => ({
+      id: session.id,
+      email: session.customer_details?.email || 'N/A',
+      metadata: session.metadata || {},
+    }));
+
+    res.status(200).json(sessionsWithMetadata);
+  } catch (error) {
+    console.error('Erro ao buscar sessões do usuário:', error);
+    res.status(500).json({ error: 'Failed to fetch user sessions' });
+  }
+};

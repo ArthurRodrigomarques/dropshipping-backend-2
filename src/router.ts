@@ -34,7 +34,8 @@ import multerConfig from "../config/multer";
 import { handleWebhook } from "./middlewares/WebHooks";
 import bodyParser from "body-parser";
 import { createAddress, deleteAddress, getAddressById, updateAddress } from "./controller/AddressController";
-import { createCheckoutSession, getAllSessions, getSessionById } from "./controller/OrderController";
+import { createCheckoutSession, getAllSessions, getSessionById, getUserSessions } from "./controller/OrderController";
+import { requestPasswordReset, resetPassword } from "./controller/PasswordResetController";
 
 export const router = Router();
 
@@ -54,6 +55,10 @@ router.get(
   // authMiddleware(["adm", "Vendedor", "Comprador"]),
   getUniqueUserId
 );
+
+// password Reset
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password', resetPassword);
 
 
 // rotas de endereço
@@ -153,6 +158,8 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), handleWebh
 router.get('/get-all-sessions', getAllSessions);
 
 router.get('/session/:id', getSessionById);
+
+router.get('/get-user-sessions/:id', getUserSessions)
 
 
 router.post(
